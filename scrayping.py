@@ -122,9 +122,9 @@ def main():
     for link_url,horse_name in zip(link_list,horse_list): 
         df = Scraping(link_url)
         print(horse_name)
-        print(df)
+        #print(df)
         
-        #Evaluate(df)
+        Evaluate(df,distance)
 
         
 
