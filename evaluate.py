@@ -1,12 +1,11 @@
 import pandas as pd
 import numpy as np
 
-
+store_list =[]
 #################
 def Evaluate(df,distance):
     print('こっから今江ニキ')
-    print(df)
-    ###############Pandasの更新毎使う変数と配列の説明
+    ###############Pandasの更新毎に初期化して使う変数とリストの説明
     p_list =[]
     ave_distinct = 0            ##平均距離
     ave_order = 0           ##平均着順(4以上は個人的に悪印象)
@@ -14,6 +13,7 @@ def Evaluate(df,distance):
     ave_agari = 0           ##平均上がり
 
     distinct_list = []      ##距離のリスト
+    distinct_time_list = [] ##距離/時間をするために時間と同期させた距離のリスト
     order_list =[]          ##順位のリスト
     time_list = []          ##タイムのリスト
     ashi_list = []          ##脚質のためのリスト
@@ -25,9 +25,10 @@ def Evaluate(df,distance):
     kisyu_dict = {}
     kisyu = ""
     i = 0
-    ########### pandasの更新前に処理結果を格納していくリストの説明
+    
 
-    ##Pandasの更新毎使う変数と配列の説明
+     
+    ##store_list   受け渡す用のリスト
 
     ################################################
     ###ここからメインのプログラム
@@ -36,16 +37,16 @@ def Evaluate(df,distance):
     for i in range(len(p_list)):                        ####ループでパンダからリストへ処理
         if p_list[i][1] is not "no_data":
             distinct_list.append(int(p_list[i][1]))
-        if p_list[i][2] is not "no_data":
+        if p_list[i][2] is not "no_data" and p_list[i][6] is not "no_data":
             order_list.append(int(p_list[i][2]))
+            kisyu_list.append(p_list[i][6])
         if p_list[i][3] is not "no_data":
             time_list.append(int(p_list[i][3]))
+            distinct_time_list.append(int(p_list[i][1]))
         if p_list[i][4] is not "no_data":
             ashi_list.append(int(p_list[i][4]))
         if p_list[i][5] is not "no_data":    
             agari_list.append(float(p_list[i][5]))
-        if p_list[i][6] is not "no_data":    
-            kisyu_list.append(p_list[i][6])
     
     ###########距離処理
     ave_distinct = sum(distinct_list) / len(distinct_list)
@@ -54,8 +55,8 @@ def Evaluate(df,distance):
     ave_order = sum(order_list) / len(order_list)
 
     #############時間処理
-    for i in range(len(distinct_list)):
-        time_list[i] = distinct_list[i] / time_list[i]              ##距離/時間で単位時間あたりに処理
+    for i in range(len(distinct_time_list)):
+        time_list[i] = distinct_time_list[i] / time_list[i]              ##距離/時間で単位時間あたりに処理
     ave_time = sum(time_list) / len(time_list)
 
     #############脚質処理
@@ -85,8 +86,9 @@ def Evaluate(df,distance):
         if order_list[i] <= 3:
             kisyu_dict[kisyu_list[i]] = kisyu_dict.get(kisyu_list[i]) + 1
     kisyu = max(kisyu_dict.items(), key = lambda x:x[1])[0]
-
-    print(ave_distinct, ave_order, ave_time, ashi, ave_agari, kisyu)
+    
+    store_list.append([ave_distinct, ave_order, ave_time, ashi, ave_agari, kisyu])
+    print(store_list)
     
 def main():
     print("モジュール確認作業")
