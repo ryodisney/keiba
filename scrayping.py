@@ -124,7 +124,8 @@ def main():
         print(horse_name)
         #print(df)
         
-        Evaluate(df,distance)
+        ave_list = Evaluate(df,distance)
+        print(ave_list)
 
         
 

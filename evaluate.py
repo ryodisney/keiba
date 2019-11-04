@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 
-store_list =[]
+
 #################
 def Evaluate(df,distance):
     print('こっから今江ニキ')
@@ -29,7 +29,7 @@ def Evaluate(df,distance):
 
      
     ##store_list   受け渡す用のリスト
-
+    store_list =[]
     ################################################
     ###ここからメインのプログラム
 
@@ -69,11 +69,11 @@ def Evaluate(df,distance):
             count_3 += 1
 
     if max(count_1, count_2, count_3) == count_1:
-        ashi = "nige"
+        ashi = "逃げ"
     elif max(count_1, count_2, count_3) == count_2:
-        ashi = "sashi"
+        ashi = "差し"
     else:
-        ashi = "oikake"
+        ashi = "追い込み"
     
     ###########登り処理
     ave_agari = sum(agari_list) / len(agari_list)
@@ -88,7 +88,8 @@ def Evaluate(df,distance):
     kisyu = max(kisyu_dict.items(), key = lambda x:x[1])[0]
     
     store_list.append([ave_distinct, ave_order, ave_time, ashi, ave_agari, kisyu])
-    print(store_list)
+    #print(store_list)
+    return store_list
     
 def main():
     print("モジュール確認作業")
