@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 import pandas as pd
 import re
-from evaluate import Evaluate
+
 
 
 pd.set_option('display.unicode.east_asian_width', True)
@@ -16,7 +16,7 @@ def Get_Race_Info(soup):
         for dd in dl.find_all('dd'):
             race_name = dd.find('h1').get_text()
             distance_moji = dd.find('p').get_text()
-            distance = re.sub(r'[芝ダm左右内外()]','',distance_moji)
+            distance = re.sub(r'[芝ダ障m左右内外()]','',distance_moji)
 
     return race_name,distance
 
@@ -25,16 +25,28 @@ def Get_Link_List(soup):
 
     link = []
     horse_list = []
+    jockey_list = []
 
     #リンク先取得
-    for td in soup.find_all('td',class_ = 'txt_l horsename'):
-        link.append(td.a.get('href'))
-        horse_list.append(td.a.get_text())
+    for td_horse in soup.find_all('td',class_ = 'txt_l horsename'):
+        link.append(td_horse.a.get('href'))
+        horse_list.append(td_horse.a.get_text())
+    
+    for i,td_jockey in enumerate(soup.find_all('td',class_ = 'txt_l')):
+        try:
+            #本当はよくないんだけど、5で割って1余る番号に騎手の名前が入ってる
+            if i % 5 == 1:
+                jockey_list.append(td_jockey.a.get_text())
+            else:
+                pass
 
-    return link,horse_list
+        except AttributeError:
+            pass
+   
+    return link,horse_list,jockey_list
 
 
-def Scraping(link_url):
+def Scraping_now(link_url):
 
     #要素を取り出す
     ele_html = requests.get(link_url)
@@ -60,7 +72,7 @@ def Scraping(link_url):
         else:
 
             date = Row[0]
-            this_distance = re.sub(r'[芝ダ]','',Row[14])
+            this_distance = re.sub(r'[芝ダ障]','',Row[14])
             arrival_order = Row[11]
             total_time = Row[17]
             pass_order = Row[20]
@@ -108,26 +120,7 @@ def is_int(s):
   return True
 
 def main():
-    url = "https://race.netkeiba.com/?pid=race_old&id=n201908050411"
-
-    html = requests.get(url)
-    soup = BeautifulSoup(html.content,'lxml')
-
-    race_name,distance = Get_Race_Info(soup)
-    print(race_name)
-    link_list,horse_list = Get_Link_List(soup)
-
-    #print(link_list)
-
-    for link_url,horse_name in zip(link_list,horse_list): 
-        df = Scraping(link_url)
-        print(horse_name)
-        #print(df)
-        
-        ave_list = Evaluate(df,distance)
-        print(ave_list)
-
-        
+    print("自作モジュール確認作業")
 
 if __name__ == "__main__":
     main()

@@ -4,7 +4,7 @@ import numpy as np
 
 #################
 def Evaluate(df,distance):
-    print('こっから今江ニキ')
+    #print('こっから今江ニキ')
     ###############Pandasの更新毎に初期化して使う変数とリストの説明
     p_list =[]
     ave_distinct = 0            ##平均距離
