@@ -3,11 +3,11 @@ import numpy as np
 
 
 #################
-def Evaluate(df,distance):
+def Average(df,distance,jockey):
     #print('こっから今江ニキ')
     ###############Pandasの更新毎に初期化して使う変数とリストの説明
     p_list =[]
-    ave_distinct = 0            ##平均距離
+    ave_distance = 0            ##平均距離
     ave_order = 0           ##平均着順(4以上は個人的に悪印象)
     ave_time = 0            ##平均時間(m/s)
     ave_agari = 0           ##平均上がり
@@ -24,7 +24,12 @@ def Evaluate(df,distance):
     count_1 ,count_2 , count_3 = 0, 0 , 0 ##カウント変数
     kisyu_dict = {}
     kisyu = ""
-    i = 0
+
+    #点数判定
+    GREAT = 5
+    GOOD = 20
+    NOT_BAD = 60
+    NO_DATA = 100
     
 
      
@@ -49,7 +54,7 @@ def Evaluate(df,distance):
             agari_list.append(float(p_list[i][5]))
     
     ###########距離処理
-    ave_distinct = sum(distinct_list) / len(distinct_list)
+    ave_distance = sum(distinct_list) / len(distinct_list)
     
     ############着順処理
     ave_order = sum(order_list) / len(order_list)
@@ -85,9 +90,32 @@ def Evaluate(df,distance):
     for i in range(len(kisyu_list)):                           ##着順3位以下の騎手をカウント
         if order_list[i] <= 3:
             kisyu_dict[kisyu_list[i]] = kisyu_dict.get(kisyu_list[i]) + 1
-    kisyu = max(kisyu_dict.items(), key = lambda x:x[1])[0]
     
-    store_list.append([ave_distinct, ave_order, ave_time, ashi, ave_agari, kisyu])
+    #騎手の回数を降順ソート
+    kisyu_sort = sorted(kisyu_dict.items(), key=lambda x:x[1],reverse=True)
+    
+    
+    for i,kisyu in enumerate(kisyu_sort):
+    
+        if jockey in kisyu[0] and i == 0:
+            score = GREAT
+            break
+        
+        elif jockey in kisyu[0] and kisyu[1] != 0:
+            score = GOOD
+            break
+        
+        elif jockey in kisyu[0]:
+            score = NOT_BAD
+            break
+        
+        else:
+            score = NO_DATA
+    
+    #kisyu = max(kisyu_dict.items(), key = lambda x:x[1])[0]
+
+    #脚質に関してはひとまず抜いた
+    store_list = [abs(ave_distance-distance), ave_order, ave_time, ave_agari, score]
     #print(store_list)
     return store_list
     

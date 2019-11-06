@@ -2,36 +2,23 @@
 
 import requests
 from bs4 import BeautifulSoup
-from scrayping_now import Scraping_now,Get_Link_List,Get_Race_Info
-from scrayping_past import Scraping_Past
-from evaluate import Evaluate
+from scrayping_now import Pass_Url_Now,Scraping_Now,Get_Link_List_Now,Get_Race_Info_Now
+from scrayping_past import Pass_Url_Past,Scraping_Past,Get_Link_List_Past,Get_Race_Info_Past
 from weight import Weight
 
 
 def main():
-    url = "https://race.netkeiba.com/?pid=race_old&id=c201903030411"
+    #今回予想したいレースのURL
+    url_now = "https://race.netkeiba.com/?pid=race_old&id=c201903030411"
 
-    html = requests.get(url)
-    soup = BeautifulSoup(html.content,'lxml')
+    #学習するレースのURL
+    url_past = "https://db.netkeiba.com/race/201905040911/"
 
-    race_name,distance = Get_Race_Info(soup)
-    print(race_name)
-    link_list,horse_list,jockey_list = Get_Link_List(soup)
+    #ave_list_now = Pass_Url_Now(url_now)
+    ave_list_past = Pass_Url_Past(url_past)
 
-    #print(link_list)
 
-    for link_url,horse_name,jockey_name in zip(link_list,horse_list,jockey_list): 
-        df = Scraping(link_url)
-        print(horse_name)
-        print(jockey_name)
-        print(df)
-        
-        ave_list = Evaluate(df,distance)
-        #print(ave_list)
-
-        weight_list = Weight(ave_list)
-
-        
+    weight_list = Weight(ave_list_past)
 
 if __name__ == "__main__":
     main()

@@ -5,44 +5,42 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
+from average import Average
 
 
 pd.set_option('display.unicode.east_asian_width', True)
 
 
-def Get_Race_Info(soup):
+def Get_Race_Info_Past(soup):
     
     for dl in soup.find_all('dl',class_='racedata fc'):
         for dd in dl.find_all('dd'):
             race_name = dd.find('h1').get_text()
             distance_moji = dd.find('p').get_text()
-            distance = re.sub(r'[芝ダ障m左右内外()]','',distance_moji)
+            distance = int(re.sub("\\D","",distance_moji.split('/')[0]))
 
     return race_name,distance
 
 
-def Get_Link_List(soup):
+def Get_Link_List_Past(soup):
 
     link = []
     horse_list = []
     jockey_list = []
 
     #リンク先取得
-    for td_horse in soup.find_all('td',class_ = 'txt_l horsename'):
-        link.append(td_horse.a.get('href'))
-        horse_list.append(td_horse.a.get_text())
-    
-    for i,td_jockey in enumerate(soup.find_all('td',class_ = 'txt_l')):
-        try:
-            #本当はよくないんだけど、5で割って1余る番号に騎手の名前が入ってる
-            if i % 5 == 1:
-                jockey_list.append(td_jockey.a.get_text())
-            else:
-                pass
+    for i,td in enumerate(soup.find_all('td',class_ = 'txt_l')):
+        try: 
+            if i % 4 == 0:
+                horse_list.append(td.a.get_text())
+                link.append("https://db.netkeiba.com/" + str(td.a.get('href')))
+
+            elif i % 4 == 1:
+                jockey_list.append(td.a.get_text())               
 
         except AttributeError:
             pass
-   
+
     return link,horse_list,jockey_list
 
 
@@ -72,7 +70,7 @@ def Scraping_Past(link_url):
         else:
 
             date = Row[0]
-            this_distance = re.sub(r'[芝ダ障]','',Row[14])
+            this_distance = re.sub('\\D','',Row[14])
             arrival_order = Row[11]
             total_time = Row[17]
             pass_order = Row[20]
@@ -118,6 +116,33 @@ def is_int(s):
   except:
     return False
   return True
+
+def Pass_Url_Past(url_past):
+    
+    html = requests.get(url_past)
+    soup = BeautifulSoup(html.content,'lxml')
+
+    race_name,distance = Get_Race_Info_Past(soup)
+    print(race_name)
+    link_list,horse_list,jockey_list = Get_Link_List_Past(soup)
+
+    #print(jockey_list)
+    ave_list = []
+
+    
+    for link_url_now,horse_name,jockey_name in zip(link_list,horse_list,jockey_list): 
+        df = Scraping_Past(link_url_now)
+        #print(horse_name)
+        #print(jockey_name)
+        #print(df)
+        
+
+        ave_temp = Average(df,distance,jockey_name)
+        ave_list.append(ave_temp)
+
+    
+    return ave_list
+
 
 def main():
     print("自作モジュール確認作業")

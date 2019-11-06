@@ -5,23 +5,25 @@ from bs4 import BeautifulSoup
 import pandas as pd
 import re
 
+from average import Average
 
 
 pd.set_option('display.unicode.east_asian_width', True)
 
 
-def Get_Race_Info(soup):
+def Get_Race_Info_Now(soup):
     
     for dl in soup.find_all('dl',class_='racedata fc'):
         for dd in dl.find_all('dd'):
             race_name = dd.find('h1').get_text()
             distance_moji = dd.find('p').get_text()
-            distance = re.sub(r'[芝ダ障m左右内外()]','',distance_moji)
+            distance = int(re.sub("\\D","",distance_moji.split('/')[0]))
+            print(distance)
 
     return race_name,distance
 
 
-def Get_Link_List(soup):
+def Get_Link_List_Now(soup):
 
     link = []
     horse_list = []
@@ -46,7 +48,7 @@ def Get_Link_List(soup):
     return link,horse_list,jockey_list
 
 
-def Scraping_now(link_url):
+def Scraping_Now(link_url):
 
     #要素を取り出す
     ele_html = requests.get(link_url)
@@ -72,7 +74,7 @@ def Scraping_now(link_url):
         else:
 
             date = Row[0]
-            this_distance = re.sub(r'[芝ダ障]','',Row[14])
+            this_distance = re.sub('\\D','',Row[14])
             arrival_order = Row[11]
             total_time = Row[17]
             pass_order = Row[20]
@@ -118,6 +120,29 @@ def is_int(s):
   except:
     return False
   return True
+
+def Pass_Url_Now(url_now):
+    
+    html = requests.get(url_now)
+    soup = BeautifulSoup(html.content,'lxml')
+
+    race_name,distance = Get_Race_Info_Now(soup)
+    print(race_name)
+    link_list,horse_list,jockey_list = Get_Link_List_Now(soup)
+
+    #print(link_list)
+    ave_list = []
+
+    for link_url_now,horse_name,jockey_name in zip(link_list,horse_list,jockey_list): 
+        df = Scraping_Now(link_url_now)
+        #print(horse_name)
+        #print(jockey_name)
+        #print(df)
+
+        ave_temp = Average(df,distance,jockey_name)
+        ave_list.append(ave_temp)
+    
+    return ave_list
 
 def main():
     print("自作モジュール確認作業")
