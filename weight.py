@@ -7,17 +7,18 @@ def Weight(ave_list_past):
     parameter_list = np.zeros(5)
     
     #パラメータを作るための変数
-    A = range(5)
-    B = range(5)
-    C = range(5)
-    D = range(5)
-    E = range(5)
+    A = range(1,26)
+    B = range(32,801,32)
+    C = range(16,401,16)
+    D = range(4,101,4)
+    E = range(4,101,4)
 
     parameter_list = list(itr.product(A,B,C,D,E))
 
     score_data = []
     flag = False
     min_list = []
+    
 
     for parameter in parameter_list:
         #行列に変換
@@ -34,13 +35,27 @@ def Weight(ave_list_past):
             print("Yes!")
             flag = False
         
+        print(parameter)
+        score_data.clear()
+        
 
     print(min_list)
 
 def Judge_Sort(score_data,flag):
     
-    if sorted(score_data) == score_data:
-        flag = True
+    score_data_sorted = sorted(score_data)
+
+    for i,score in enumerate(score_data_sorted):
+        if score == score_data[i]:
+            if i > 1:
+                flag = True
+                break
+        
+        else:
+            break
+    
+    return flag
+
         
     return flag
 

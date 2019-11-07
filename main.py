@@ -16,8 +16,7 @@ def main():
 
     #ave_list_now = Pass_Url_Now(url_now)
     ave_list_past = Pass_Url_Past(url_past)
-
-
+    
     weight_list = Weight(ave_list_past)
 
 if __name__ == "__main__":
